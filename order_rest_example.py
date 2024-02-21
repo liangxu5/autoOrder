@@ -14,7 +14,7 @@ async def main():
         wallet_address="",
         api_key="",
         api_secret="",
-        env="testnet",
+        env="mainnet",
     )
 
     if not aevo.signing_key:
@@ -25,18 +25,16 @@ async def main():
     logger.info("Creating order...")
     while True:
         time.sleep(5)
-        # 1. 首先知道钱包里的钱数
+        # 1. 获取钱包余额
         b = aevo.rest_get_account()
         equity = b["equity"]
         logger.info("钱包余额为：" + equity)
         # 2. 开仓
         markets = aevo.get_markets("BNB")
         price = markets[0]["index_price"]
-        # equity = decimal(equity) / 3 * 2
         quantity = round(float(equity) / float(price), 2)
-        if float(equity) < 9:
+        if float(equity) < 11:
             return
-            # is_buy=True,
         response1 = aevo.rest_create_market_order(
             instrument_id=4042,
             is_buy=True,
