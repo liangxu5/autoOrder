@@ -47,13 +47,13 @@ class Order(EIP712Struct):
 
 class AevoClient:
     def __init__(
-        self,
-        signing_key="",
-        wallet_address="",
-        api_key="",
-        api_secret="",
-        env="testnet",
-        rest_headers={},
+            self,
+            signing_key="",
+            wallet_address="",
+            api_key="",
+            api_secret="",
+            env="testnet",
+            rest_headers={},
     ):
         self.signing_key = signing_key
         self.wallet_address = wallet_address
@@ -144,8 +144,8 @@ class AevoClient:
                 )
                 yield message
             except (
-                websockets.exceptions.ConnectionClosedError,
-                websockets.exceptions.ConnectionClosedOK,
+                    websockets.exceptions.ConnectionClosedError,
+                    websockets.exceptions.ConnectionClosedOK,
             ) as e:
                 if on_disconnect:
                     on_disconnect()
@@ -183,7 +183,7 @@ class AevoClient:
 
     # Private REST API
     def rest_create_order(
-        self, instrument_id, is_buy, limit_price, quantity, post_only=True
+            self, instrument_id, is_buy, limit_price, quantity, post_only=True
     ):
         data, order_id = self.create_order_rest_json(
             int(instrument_id), is_buy, limit_price, quantity, post_only
@@ -200,14 +200,14 @@ class AevoClient:
     def rest_create_market_order(self, instrument_id, is_buy, quantity):
         limit_price = 0
         if is_buy:
-            limit_price = 2**256 - 1
+            limit_price = 2 ** 256 - 1
 
         data, order_id = self.create_order_rest_json(
             int(instrument_id),
             is_buy,
             limit_price,
             quantity,
-            decimals=1,
+            price_decimals=1,
             post_only=False,
         )
 
@@ -238,9 +238,9 @@ class AevoClient:
         return req.json()
 
     def rest_cancel_all_orders(
-        self,
-        instrument_type=None,
-        asset=None,
+            self,
+            instrument_type=None,
+            asset=None,
     ):
         body = {}
         if instrument_type:
@@ -324,15 +324,15 @@ class AevoClient:
 
     # Private WS Commands
     def create_order_ws_json(
-        self,
-        instrument_id,
-        is_buy,
-        limit_price,
-        quantity,
-        post_only=True,
-        mmp=True,
-        price_decimals=10**6,
-        amount_decimals=10**6,
+            self,
+            instrument_id,
+            is_buy,
+            limit_price,
+            quantity,
+            post_only=True,
+            mmp=True,
+            price_decimals=10 ** 6,
+            amount_decimals=10 ** 6,
     ):
         timestamp = int(time.time())
         salt, signature, order_id = self.sign_order(
@@ -359,18 +359,18 @@ class AevoClient:
         return payload, order_id
 
     def create_order_rest_json(
-        self,
-        instrument_id,
-        is_buy,
-        limit_price,
-        quantity,
-        post_only=True,
-        reduce_only=False,
-        close_position=False,
-        price_decimals=10**6,
-        amount_decimals=10**6,
-        trigger=None,
-        stop=None,
+            self,
+            instrument_id,
+            is_buy,
+            limit_price,
+            quantity,
+            post_only=True,
+            reduce_only=False,
+            close_position=False,
+            price_decimals=10 ** 6,
+            amount_decimals=10 ** 6,
+            trigger=None,
+            stop=None,
     ):
         timestamp = int(time.time())
         salt, signature, order_id = self.sign_order(
@@ -401,14 +401,14 @@ class AevoClient:
         return payload, order_id
 
     async def create_order(
-        self,
-        instrument_id,
-        is_buy,
-        limit_price,
-        quantity,
-        post_only=True,
-        id=None,
-        mmp=True,
+            self,
+            instrument_id,
+            is_buy,
+            limit_price,
+            quantity,
+            post_only=True,
+            id=None,
+            mmp=True,
     ):
         data, order_id = self.create_order_ws_json(
             instrument_id=int(instrument_id),
@@ -428,15 +428,15 @@ class AevoClient:
         return order_id
 
     async def edit_order(
-        self,
-        order_id,
-        instrument_id,
-        is_buy,
-        limit_price,
-        quantity,
-        id=None,
-        post_only=True,
-        mmp=True,
+            self,
+            order_id,
+            instrument_id,
+            is_buy,
+            limit_price,
+            quantity,
+            id=None,
+            post_only=True,
+            mmp=True,
     ):
         timestamp = int(time.time())
         instrument_id = int(instrument_id)
@@ -454,8 +454,8 @@ class AevoClient:
                 "instrument": instrument_id,
                 "maker": self.wallet_address,
                 "is_buy": is_buy,
-                "amount": str(int(round(quantity * 10**6, is_buy))),
-                "limit_price": str(int(round(limit_price * 10**6, is_buy))),
+                "amount": str(int(round(quantity * 10 ** 6, is_buy))),
+                "limit_price": str(int(round(limit_price * 10 ** 6, is_buy))),
                 "salt": str(salt),
                 "signature": signature,
                 "post_only": post_only,
@@ -485,16 +485,16 @@ class AevoClient:
         await self.send(json.dumps(payload))
 
     def sign_order(
-        self,
-        instrument_id,
-        is_buy,
-        limit_price,
-        quantity,
-        timestamp,
-        price_decimals=10**6,
-        amount_decimals=10**6,
+            self,
+            instrument_id,
+            is_buy,
+            limit_price,
+            quantity,
+            timestamp,
+            price_decimals=10 ** 6,
+            amount_decimals=10 ** 6,
     ):
-        salt = random.randint(0, 10**10)  # We just need a large enough number
+        salt = random.randint(0, 10 ** 10)  # We just need a large enough number
 
         order_struct = Order(
             maker=self.wallet_address,  # The wallet"s main address

@@ -1,4 +1,6 @@
 import asyncio
+import time
+from unicodedata import decimal
 
 from loguru import logger
 
@@ -21,22 +23,34 @@ async def main():
         )
 
     logger.info("Creating order...")
-    # ETH-PERP has an instrument id of 2054 on testnet, you can find the instrument id of other markets by looking at this endpoint: https://api-testnet.aevo.xyz/markets
-    response = aevo.rest_create_order(
-        instrument_id=2054,
-        is_buy=True,
-        limit_price=1200,
-        quantity=0.01,
-        post_only=False,
-    )
-    logger.info(response)
-    order_id = response["order_id"]
-
-    logger.info("Cancelling order...")
-    response = aevo.rest_cancel_order(
-        order_id=order_id,
-    )
-    logger.info(response)
+    while True:
+        time.sleep(5)
+        # 1. 首先知道钱包里的钱数
+        b = aevo.rest_get_account()
+        equity = b["equity"]
+        logger.info("钱包余额为：" + equity)
+        # 2. 开仓
+        markets = aevo.get_markets("BNB")
+        price = markets[0]["index_price"]
+        # equity = decimal(equity) / 3 * 2
+        quantity = round(float(equity) / float(price), 2)
+        if float(equity) < 9:
+            return
+            # is_buy=True,
+        response1 = aevo.rest_create_market_order(
+            instrument_id=4042,
+            is_buy=True,
+            quantity=quantity,
+        )
+        logger.info(response1)
+        # 3. 关仓
+        time.sleep(2)
+        response2 = aevo.rest_create_market_order(
+            instrument_id=4042,
+            is_buy=False,
+            quantity=quantity,
+        )
+        logger.info(response2)
 
 
 if __name__ == "__main__":
