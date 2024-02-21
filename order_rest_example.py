@@ -33,7 +33,7 @@ async def main():
         markets = aevo.get_markets("BNB")
         price = markets[0]["index_price"]
         quantity = round(float(equity) / float(price), 2)
-        if float(equity) < 11:
+        if float(equity) < 9:
             return
         response1 = aevo.rest_create_market_order(
             instrument_id=4042,
